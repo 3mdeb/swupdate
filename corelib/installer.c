@@ -43,6 +43,7 @@
 #include "parsers.h"
 #include "fw_env.h"
 #include "progress.h"
+#include "grub_env.h"
 
 static int isImageInstalled(struct swver *sw_ver_list,
 				struct img_type *img)
@@ -200,6 +201,21 @@ static int update_uboot_env(void)
 	if (ret < 0)
 		ERROR("Error updating U-Boot environment");
 #endif
+	return ret;
+}
+
+static int update_grub_env(struct swupdate_cfg *cfg, const char *script)
+{
+	int ret = 0;
+	struct dict_entry *grubvar;
+//	char buf[MAX_UBOOT_SCRIPT_LINE_LENGTH];
+	TRACE("Updating GRUB environment");
+
+	LIST_FOREACH(grubvar, &cfg->grub, next) {
+		if (!grubvar->varname || !grubvar->value)
+			continue;
+        grub_set_variables(grubvar->varname, grubvar->value);
+	}
 	return ret;
 }
 
