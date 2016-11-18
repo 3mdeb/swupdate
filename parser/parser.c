@@ -384,7 +384,7 @@ static void parse_grub(parsertype p, void *cfg, struct swupdate_cfg *swcfg)
 
 		TRACE("GRUB var: %s = %s\n",
 			name,
-			dict_get_value(&swcfg->uboot, name));
+			dict_get_value(&swcfg->grub, name));
 
 	}
 }
@@ -534,6 +534,7 @@ static void parser(parsertype p, void *cfg, struct swupdate_cfg *swcfg)
 	parse_images(p, cfg, swcfg);
 	parse_scripts(p, cfg, swcfg);
 	parse_uboot(p, cfg, swcfg);
+	parse_grub(p, cfg, swcfg);
 	parse_files(p, cfg, swcfg);
 
 	/*
