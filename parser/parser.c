@@ -347,6 +347,48 @@ static void parse_uboot(parsertype p, void *cfg, struct swupdate_cfg *swcfg)
 	}
 }
 
+static void parse_grub(parsertype p, void *cfg, struct swupdate_cfg *swcfg)
+{
+	void *setting, *elem;
+	int count, i;
+	char name[32];
+	char value[255];
+
+	setting = find_node(p, cfg, "grub", swcfg);
+
+	if (setting == NULL)
+		return;
+
+	count = get_array_length(p, setting);
+	for(i = (count - 1); i >= 0; --i) {
+		elem = get_elem_from_idx(p, setting, i);
+
+		if (!elem)
+			continue;
+
+		/*
+		 * Check for mandatory field
+		 */
+		if(!(exist_field_string(p, elem, "name"))) {
+			TRACE("GRUB entry without variable name field, skipping..");
+			continue;
+		}
+
+		/*
+		 * Call directly get_field_string with size 0
+		 * to let allocate the place for the strings
+		 */
+		GET_FIELD_STRING(p, elem, "name", name);
+		GET_FIELD_STRING(p, elem, "value", value);
+		dict_set_value(&swcfg->grub, name, value);
+
+		TRACE("GRUB var: %s = %s\n",
+			name,
+			dict_get_value(&swcfg->uboot, name));
+
+	}
+}
+
 static void parse_images(parsertype p, void *cfg, struct swupdate_cfg *swcfg)
 {
 	void *setting, *elem;
