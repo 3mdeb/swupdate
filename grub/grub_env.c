@@ -22,7 +22,7 @@ grub_envblk_open (char *buf, size_t size)
     {
       envblk->buf = buf;
       envblk->size = size;
-      envblk->fname = GRUB_ENVBLK_PATH;
+      envblk->fname = (char*)GRUB_ENVBLK_PATH;
     }
 
   return envblk;
@@ -70,7 +70,7 @@ find_next_line (char *p, const char *pend)
 }
 
 int
-grub_envblk_set (grub_envblk_t envblk, const char *name, const char *value)
+grub_envblk_set (grub_envblk_t envblk, char *name, char *value)
 {
   char *p, *pend;
   char *space; // free space (chars) left in grubenv
@@ -168,7 +168,7 @@ grub_envblk_set (grub_envblk_t envblk, const char *name, const char *value)
 }
 
 void
-grub_envblk_delete (grub_envblk_t envblk, const char *name)
+grub_envblk_delete (grub_envblk_t envblk, char *name)
 {
   char *p, *pend;
   int nl; // length of name
@@ -208,15 +208,15 @@ grub_envblk_delete (grub_envblk_t envblk, const char *name)
     }
 }
 
-static grub_envblk_t
-open_envblk_file (char *fname)
+grub_envblk_t
+grub_open_envblk_file (void)
 {
   FILE *fp;
   char *buf;
   size_t size;
   grub_envblk_t envblk;
 
-  fp = fopen (fname, "rb");
+  fp = fopen (GRUB_DEFAULT_ENVBLK_PATH, "rb");
   if (! fp)
     {
     // should we create env file if it's missing ?
@@ -230,12 +230,12 @@ open_envblk_file (char *fname)
     }
 
   if (fseek (fp, 0, SEEK_END) < 0)
-    fprintf(stderr, "GRUB: cannot seek %s", fname);
+    fprintf(stderr, "GRUB: cannot seek %s", envblk->fname);
 
   size = (size_t) ftell (fp);
 
   if (fseek (fp, 0, SEEK_SET) < 0)
-    fprintf(stderr, "GRUB: cannot seek %s", fname);
+    fprintf(stderr, "GRUB: cannot seek %s", envblk->fname);
 
   buf=malloc(size);
   if (!buf)
@@ -245,29 +245,30 @@ open_envblk_file (char *fname)
   }
 
   if (fread (buf, 1, size, fp) != size)
-    fprintf(stderr, "cannot read %s", fname);
+    fprintf(stderr, "cannot read %s", envblk->fname);
 
   fclose (fp);
 
+  fprintf(stderr, "buf = %s size = %ld \n", buf, size);
   envblk = grub_envblk_open (buf, size);
   if (! envblk)
-    fprintf(stderr, "invalid environment block");
+    fprintf(stderr, "invalid environment block\n");
 
   return envblk;
 }
 
-static void
-write_envblk (const char *fname, grub_envblk_t envblk)
+void
+grub_write_envblk (grub_envblk_t envblk)
 {
   FILE *fp;
 
-  fp = fopen (fname, "wb");
+  fp = fopen (envblk->fname, "wb");
   if (! fp)
-    fprintf(stderr, "cannot open %s", fname);
+    fprintf(stderr, "cannot open %s", envblk->fname);
 
   if (fwrite (grub_envblk_buffer (envblk), 1, grub_envblk_size (envblk), fp)
       != grub_envblk_size (envblk))
-    fprintf(stderr, "cannot write to %s", fname);
+    fprintf(stderr, "cannot write to %s", envblk->fname);
 
   static int allow_fd_syncs = 1;
 
@@ -277,12 +278,13 @@ write_envblk (const char *fname, grub_envblk_t envblk)
   fclose (fp);
 }
 
-static void
-set_variables (char *fname, char *name, char *value)
+void
+grub_set_variables (char *name, char *value)
 {
+  fprintf(stderr, "grubsV\n");
   grub_envblk_t envblk;
-
-  envblk = open_envblk_file (fname);
+  fprintf(stderr, "grubsV2\n");
+  envblk = grub_open_envblk_file ();
   //while (argc)
   //  {
   //    char *p;
@@ -300,20 +302,20 @@ set_variables (char *fname, char *name, char *value)
   //    argv++;
   //  }
   //
+  fprintf(stderr, "grubsV3\n");
   if (!grub_envblk_set (envblk, name, value))
       fprintf(stderr, "environment block too small");
 
-  write_envblk (name, envblk);
+  grub_write_envblk (envblk);
   grub_envblk_close (envblk);
 }
 
-static void
-unset_variables (char *fname, char *name, char *value)
+void
+grub_unset_variables (char *name)
 {
   grub_envblk_t envblk;
-
-  envblk = open_envblk_file (fname);
-      grub_envblk_delete (envblk, name);
-  write_envblk (name, envblk);
+  envblk = grub_open_envblk_file ();
+  grub_envblk_delete (envblk, name);
+  grub_write_envblk (envblk);
   grub_envblk_close (envblk);
 }
