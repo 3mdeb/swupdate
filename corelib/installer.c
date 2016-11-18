@@ -209,7 +209,7 @@ static int update_uboot_env(void)
 	return ret;
 }
 
-static int update_grub_env(struct swupdate_cfg *cfg, const char *script)
+static int update_grub_env(struct swupdate_cfg *cfg)
 {
 	int ret = 0;
 	struct dict_entry *grubvar;
@@ -282,6 +282,12 @@ int install_images(struct swupdate_cfg *sw, int fdsw, int fromfile)
 
 	/* Update u-boot environment */
 	ret = prepare_uboot_script(sw, UBOOT_SCRIPT);
+	if (ret) {
+		return ret;
+	}
+
+	/* Update GRUB environment */
+	ret = update_grub_env(sw);
 	if (ret) {
 		return ret;
 	}
