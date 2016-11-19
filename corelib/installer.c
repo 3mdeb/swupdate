@@ -219,7 +219,7 @@ static int update_grub_env(struct swupdate_cfg *cfg)
 	LIST_FOREACH(grubvar, &cfg->grub, next) {
 		if (!grubvar->varname || !grubvar->value)
 			continue;
-        grub_set_variables(grubvar->varname, grubvar->value);
+        grub_set_variable(grubvar->varname, grubvar->value);
 	}
 	return ret;
 }
