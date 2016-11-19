@@ -4,7 +4,16 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-grub_envblk_t
+/* internal functions prototypes */
+static grub_envblk_t grub_envblk_open (char *buf, size_t size);
+static int grub_envblk_set (grub_envblk_t envblk, char *name, char *value);
+static void grub_envblk_delete (grub_envblk_t envblk, char *name);
+static void grub_envblk_close (grub_envblk_t envblk);
+
+static grub_envblk_t grub_open_envblk_file (void);
+static void grub_write_envblk (grub_envblk_t envblk);
+
+static grub_envblk_t
 grub_envblk_open (char *buf, size_t size)
 {
   grub_envblk_t envblk;
@@ -13,7 +22,7 @@ grub_envblk_open (char *buf, size_t size)
       || memcmp (buf, GRUB_ENVBLK_SIGNATURE,
                       sizeof (GRUB_ENVBLK_SIGNATURE) - 1))
     {
-      fprintf(stderr, "GRUB: invalid environment block");
+      fprintf(stderr, "GRUB: invalid environment block\n");
       return 0;
     }
 
@@ -22,14 +31,12 @@ grub_envblk_open (char *buf, size_t size)
     {
       envblk->buf = buf;
       envblk->size = size;
-      envblk->fname = (char*)GRUB_ENVBLK_PATH;
     }
 
   return envblk;
 }
 
-
-void
+static void
 grub_envblk_close (grub_envblk_t envblk)
 {
   free (envblk->buf);
@@ -69,7 +76,7 @@ find_next_line (char *p, const char *pend)
   return p + 1;
 }
 
-int
+static int
 grub_envblk_set (grub_envblk_t envblk, char *name, char *value)
 {
   char *p, *pend;
@@ -167,7 +174,7 @@ grub_envblk_set (grub_envblk_t envblk, char *name, char *value)
   return 1;
 }
 
-void
+static void
 grub_envblk_delete (grub_envblk_t envblk, char *name)
 {
   char *p, *pend;
@@ -208,7 +215,7 @@ grub_envblk_delete (grub_envblk_t envblk, char *name)
     }
 }
 
-grub_envblk_t
+static grub_envblk_t
 grub_open_envblk_file (void)
 {
   FILE *fp;
@@ -220,55 +227,55 @@ grub_open_envblk_file (void)
   if (! fp)
     {
     // should we create env file if it's missing ?
+    //
     //  /* Create the file implicitly.  */
     //  grub_util_create_envblk_file (name);
     //  fp = grub_util_fopen (name, "rb");
     //  if (! fp)
     //    grub_util_error (_("cannot open `%s': %s"), name,
-	//		 strerror (errno));
+    //    strerror (errno));
         fprintf(stderr, "GRUB: grubenv file is missing\n");
     }
 
   if (fseek (fp, 0, SEEK_END) < 0)
-    fprintf(stderr, "GRUB: cannot seek %s", envblk->fname);
+    fprintf(stderr, "GRUB: cannot seek %s\n", GRUB_ENVBLK_PATH);
 
   size = (size_t) ftell (fp);
 
   if (fseek (fp, 0, SEEK_SET) < 0)
-    fprintf(stderr, "GRUB: cannot seek %s", envblk->fname);
+    fprintf(stderr, "GRUB: cannot seek %s\n", GRUB_ENVBLK_PATH);
 
   buf=malloc(size);
   if (!buf)
   {
-        fprintf(stderr, "No memory: malloc failed\n");
+        fprintf(stderr, "GRUB: No memory: malloc failed\n");
         return NULL;
   }
 
   if (fread (buf, 1, size, fp) != size)
-    fprintf(stderr, "cannot read %s", envblk->fname);
+    fprintf(stderr, "GRUB: cannot read %s\n", GRUB_ENVBLK_PATH);
 
   fclose (fp);
 
-  fprintf(stderr, "buf = %s size = %ld \n", buf, size);
   envblk = grub_envblk_open (buf, size);
   if (! envblk)
-    fprintf(stderr, "invalid environment block\n");
+    fprintf(stderr, "GRUB: invalid environment block\n");
 
   return envblk;
 }
 
-void
+static void
 grub_write_envblk (grub_envblk_t envblk)
 {
   FILE *fp;
 
-  fp = fopen (envblk->fname, "wb");
+  fp = fopen (GRUB_ENVBLK_PATH, "wb");
   if (! fp)
-    fprintf(stderr, "cannot open %s", envblk->fname);
+    fprintf(stderr, "GRUB: cannot open %s\n", GRUB_ENVBLK_PATH);
 
   if (fwrite (grub_envblk_buffer (envblk), 1, grub_envblk_size (envblk), fp)
       != grub_envblk_size (envblk))
-    fprintf(stderr, "cannot write to %s", envblk->fname);
+    fprintf(stderr, "GRUB: cannot write to %s\n", GRUB_ENVBLK_PATH);
 
   static int allow_fd_syncs = 1;
 
@@ -279,39 +286,19 @@ grub_write_envblk (grub_envblk_t envblk)
 }
 
 void
-grub_set_variables (char *name, char *value)
+grub_set_variable (char *name, char *value)
 {
-  fprintf(stderr, "grubsV\n");
   grub_envblk_t envblk;
-  fprintf(stderr, "grubsV2\n");
   envblk = grub_open_envblk_file ();
-  //while (argc)
-  //  {
-  //    char *p;
-
-  //    p = strchr (argv[0], '=');
-  //    if (! p)
-  //      grub_util_error (_("invalid parameter %s"), argv[0]);
-
-  //    *(p++) = 0;
-
-  //    if (! grub_envblk_set (envblk, argv[0], p))
-  //      grub_util_error ("%s", _("environment block too small"));
-
-  //    argc--;
-  //    argv++;
-  //  }
-  //
-  fprintf(stderr, "grubsV3\n");
   if (!grub_envblk_set (envblk, name, value))
-      fprintf(stderr, "environment block too small");
+      fprintf(stderr, "GRUB: environment block too small\n");
 
   grub_write_envblk (envblk);
   grub_envblk_close (envblk);
 }
 
 void
-grub_unset_variables (char *name)
+grub_unset_variable (char *name)
 {
   grub_envblk_t envblk;
   envblk = grub_open_envblk_file ();

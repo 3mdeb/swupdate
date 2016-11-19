@@ -17,15 +17,10 @@ struct grub_envblk
 
 //int grub_parse_script(char *name);
 typedef struct grub_envblk *grub_envblk_t;
-grub_envblk_t grub_envblk_open (char *buf, size_t size);
-int grub_envblk_set (grub_envblk_t envblk, char *name, char *value);
-void grub_envblk_delete (grub_envblk_t envblk, char *name);
-void grub_envblk_close (grub_envblk_t envblk);
 
-grub_envblk_t grub_open_envblk_file (void);
-void grub_write_envblk (grub_envblk_t envblk);
-void grub_set_variables (char *name, char *value);
-void grub_unset_variables (char *name);
+/* only 'set' and 'unset' are callable from external */
+void grub_set_variable (char *name, char *value);
+void grub_unset_variable (char *name);
 
 static inline char *
 grub_envblk_buffer (const grub_envblk_t envblk)
