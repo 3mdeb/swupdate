@@ -13,7 +13,6 @@ struct grub_envblk
 {
   char *buf;
   size_t size;
-  char *fname;
 };
 
 //int grub_parse_script(char *name);
