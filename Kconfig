@@ -313,12 +313,6 @@ config WEBSERVER
 	help
 	  Enable update from remote using a webserver on the target.
 
-config GRUB
-	bool "Enable GRUB"
-	default n
-	help
-	   GRUB
-
 source mongoose/Config.in
 
 source archival/Config.in
