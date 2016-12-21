@@ -223,7 +223,7 @@ grub_open_envblk_file (void)
   size_t size;
   grub_envblk_t envblk;
 
-  fp = fopen (GRUB_DEFAULT_ENVBLK_PATH, "rb");
+  fp = fopen (GRUB_ENVBLK_PATH, "rb");
   if (! fp)
     {
     // should we create env file if it's missing ?
@@ -234,7 +234,7 @@ grub_open_envblk_file (void)
     //  if (! fp)
     //    grub_util_error (_("cannot open `%s': %s"), name,
     //    strerror (errno));
-        fprintf(stderr, "GRUB: grubenv file is missing\n");
+        fprintf(stderr, "GRUB: %s file is missing\n", GRUB_ENVBLK_PATH);
     }
 
   if (fseek (fp, 0, SEEK_END) < 0)
