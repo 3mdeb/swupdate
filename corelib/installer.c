@@ -207,15 +207,17 @@ static int update_uboot_env(void)
 static int update_grub_env(struct swupdate_cfg *cfg)
 {
 	int ret = 0;
+
+#ifdef CONFIG_GRUB
 	struct dict_entry *grubvar;
-//	char buf[MAX_UBOOT_SCRIPT_LINE_LENGTH];
 	TRACE("Updating GRUB environment");
 
 	LIST_FOREACH(grubvar, &cfg->grub, next) {
 		if (!grubvar->varname || !grubvar->value)
 			continue;
-        grub_set_variable(grubvar->varname, grubvar->value);
+		grub_set_variable(grubvar->varname, grubvar->value);
 	}
+#endif /* CONFIG_GRUB */
 	return ret;
 }
 
