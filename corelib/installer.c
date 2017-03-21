@@ -43,7 +43,10 @@
 #include "parsers.h"
 #include "fw_env.h"
 #include "progress.h"
+
+#ifdef CONFIG_GRUB
 #include "grub_env.h"
+#endif /* CONFIG_GRUB */
 
 static int isImageInstalled(struct swver *sw_ver_list,
 				struct img_type *img)
