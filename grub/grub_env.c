@@ -235,15 +235,20 @@ grub_open_envblk_file(void)
 		 * fp = grub_util_fopen (name, "rb");
 		 */
 		fprintf(stderr, "GRUB: %s file is missing\n", GRUB_ENVBLK_PATH);
+		return NULL;
 	}
 
-	if (fseek(fp, 0, SEEK_END) < 0)
+	if (fseek(fp, 0, SEEK_END) < 0) {
 		fprintf(stderr, "GRUB: cannot seek %s\n", GRUB_ENVBLK_PATH);
+		return NULL;
+	}
 
 	size = (size_t)ftell(fp);
 
-	if (fseek(fp, 0, SEEK_SET) < 0)
+	if (fseek(fp, 0, SEEK_SET) < 0) {
 		fprintf(stderr, "GRUB: cannot seek %s\n", GRUB_ENVBLK_PATH);
+		return NULL;
+	}
 
 	buf = malloc(size);
 	if (!buf) {
@@ -251,14 +256,18 @@ grub_open_envblk_file(void)
 		return NULL;
 	}
 
-	if (fread(buf, 1, size, fp) != size)
+	if (fread(buf, 1, size, fp) != size) {
 		fprintf(stderr, "GRUB: cannot read %s\n", GRUB_ENVBLK_PATH);
+		return NULL;
+	}
 
 	fclose(fp);
 
 	envblk = grub_envblk_open(buf, size);
-	if (!envblk)
+	if (!envblk) {
 		fprintf(stderr, "GRUB: invalid environment block\n");
+		return NULL;
+	}
 
 	return envblk;
 }
