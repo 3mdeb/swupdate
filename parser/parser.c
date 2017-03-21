@@ -349,6 +349,7 @@ static void parse_uboot(parsertype p, void *cfg, struct swupdate_cfg *swcfg)
 	}
 }
 
+#ifdef CONFIG_GRUB
 static void parse_grub(parsertype p, void *cfg, struct swupdate_cfg *swcfg)
 {
 	void *setting, *elem;
@@ -390,6 +391,7 @@ static void parse_grub(parsertype p, void *cfg, struct swupdate_cfg *swcfg)
 
 	}
 }
+#endif /* config_grub */
 
 static void parse_images(parsertype p, void *cfg, struct swupdate_cfg *swcfg)
 {
@@ -538,7 +540,9 @@ static int parser(parsertype p, void *cfg, struct swupdate_cfg *swcfg)
 	parse_images(p, cfg, swcfg);
 	parse_scripts(p, cfg, swcfg);
 	parse_uboot(p, cfg, swcfg);
+#ifdef CONFIG_GRUB
 	parse_grub(p, cfg, swcfg);
+#endif /* config_grub */
 	parse_files(p, cfg, swcfg);
 
 	/*
@@ -550,8 +554,10 @@ static int parser(parsertype p, void *cfg, struct swupdate_cfg *swcfg)
 	if (LIST_EMPTY(&swcfg->images) &&
 	    LIST_EMPTY(&swcfg->partitions) &&
 	    LIST_EMPTY(&swcfg->scripts) &&
-	    LIST_EMPTY(&swcfg->uboot) &&
-	    LIST_EMPTY(&swcfg->grub)) {
+#ifdef CONFIG_GRUB
+	    LIST_EMPTY(&swcfg->grub) &&
+#endif /* config_grub */
+	    LIST_EMPTY(&swcfg->uboot)) {
 		ERROR("Found nothing to install\n");
 		return -1;
 	}
