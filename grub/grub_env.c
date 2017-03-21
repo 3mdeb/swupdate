@@ -112,7 +112,7 @@ grub_envblk_set(grub_envblk_t envblk, char *name, char *value)
 
 	if (*space != '\n')
 		/* Broken.  */
-		return 0;
+		return -1;
 
 	space++;
 
@@ -135,11 +135,11 @@ grub_envblk_set(grub_envblk_t envblk, char *name, char *value)
 
 			if (p + len >= pend)
 				/* Broken.  */
-				return 0;
+				return -1;
 
 			if (pend - space < vl - len)
 				/* No space.  */
-				return 0;
+				return -1;
 
 			if (vl < len) {
 				/* Move the following characters backward, and fill the new
@@ -162,7 +162,7 @@ grub_envblk_set(grub_envblk_t envblk, char *name, char *value)
 
 		if (pend - space < nl + 1 + vl + 1)
 			/* No space.  */
-			return 0;
+			return -1;
 
 		memcpy(space, name, nl);
 		p = space + nl;
@@ -178,7 +178,7 @@ grub_envblk_set(grub_envblk_t envblk, char *name, char *value)
 	}
 
 	*p = '\n';
-	return 1;
+	return 0;
 }
 
 static void
