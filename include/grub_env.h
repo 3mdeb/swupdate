@@ -9,10 +9,12 @@
 #define GRUB_ENVBLK_PATH GRUB_DEFAULT_ENVBLK_PATH
 #endif /* CONFIG_GRUB_ENV */
 
-struct grub_envblk {
+struct grub_envblk
+{
 	char *buf;
 	size_t size;
 };
+
 
 /* U-Boot handler allows to set multiple env variables by listing them in a
  * file. It has not been implemented for GRUB since we did not need this.
@@ -22,11 +24,17 @@ struct grub_envblk {
 typedef struct grub_envblk *grub_envblk_t;
 
 /* only 'set' and 'unset' are callable from external */
-void grub_set_variable(char *name, char *value);
-void grub_unset_variable(char *name);
+int grub_set_variable(char *name, char *value);
+/* unset is not used at the moment */
+/* In case of U-Boot, variable is being unset when no value is given.
+ * In many grub.cfg configuration files, setting empty value to a variable
+ * seems to be quite common practice. Implementing unsetting variables policy
+ * as in case of U-Boot (no value = unset) may limit usage of grub.cfg
+ */
+int grub_unset_variable(char *name);
 
-static inline char
-*grub_envblk_buffer(const grub_envblk_t envblk)
+static inline char *
+grub_envblk_buffer(const grub_envblk_t envblk)
 {
 	return envblk->buf;
 }
