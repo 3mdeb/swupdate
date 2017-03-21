@@ -221,6 +221,8 @@ static int update_grub_env(struct swupdate_cfg *cfg)
 		if (!grubvar->varname || !grubvar->value)
 			continue;
 		ret = grub_set_variable(grubvar->varname, grubvar->value);
+		if (ret < 0)
+			ERROR("Error updating GRUB environment");
 	}
 #endif /* CONFIG_GRUB */
 	return ret;
