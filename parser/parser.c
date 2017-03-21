@@ -548,7 +548,8 @@ static int parser(parsertype p, void *cfg, struct swupdate_cfg *swcfg)
 	if (LIST_EMPTY(&swcfg->images) &&
 	    LIST_EMPTY(&swcfg->partitions) &&
 	    LIST_EMPTY(&swcfg->scripts) &&
-	    LIST_EMPTY(&swcfg->uboot)) {
+	    LIST_EMPTY(&swcfg->uboot) &&
+	    LIST_EMPTY(&swcfg->grub)) {
 		ERROR("Found nothing to install\n");
 		return -1;
 	}
