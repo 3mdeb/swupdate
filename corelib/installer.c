@@ -204,11 +204,11 @@ static int update_uboot_env(void)
 	return ret;
 }
 
+#ifdef CONFIG_GRUB
 static int update_grub_env(struct swupdate_cfg *cfg)
 {
 	int ret = 0;
 
-#ifdef CONFIG_GRUB
 	struct dict_entry *grubvar;
 	TRACE("Updating GRUB environment");
 
@@ -221,9 +221,9 @@ static int update_grub_env(struct swupdate_cfg *cfg)
 			break;
 		}
 	}
-#endif /* CONFIG_GRUB */
 	return ret;
 }
+#endif /* CONFIG_GRUB */
 
 int install_single_image(struct img_type *img)
 {
@@ -287,11 +287,13 @@ int install_images(struct swupdate_cfg *sw, int fdsw, int fromfile)
 		return ret;
 	}
 
+#ifdef CONFIG_GRUB
 	/* Update GRUB environment */
 	ret = update_grub_env(sw);
 	if (ret) {
 		return ret;
 	}
+#endif /* CONFIG_GRUB */
 
 	LIST_FOREACH(img, &sw->images, next) {
 
