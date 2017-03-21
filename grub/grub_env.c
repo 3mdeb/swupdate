@@ -26,11 +26,12 @@
 /* internal functions prototypes */
 static grub_envblk_t grub_envblk_open(char *buf, size_t size);
 static int grub_envblk_set(grub_envblk_t envblk, char *name, char *value);
-static void grub_envblk_delete(grub_envblk_t envblk, char *name);
+/* unsetting variable is not used at the moment */
+static int grub_envblk_delete(grub_envblk_t envblk, char *name);
 static void grub_envblk_close(grub_envblk_t envblk);
 
 static grub_envblk_t grub_open_envblk_file(void);
-static void grub_write_envblk(grub_envblk_t envblk);
+static int grub_write_envblk(grub_envblk_t envblk);
 
 static grub_envblk_t
 grub_envblk_open(char *buf, size_t size)
@@ -181,7 +182,8 @@ grub_envblk_set(grub_envblk_t envblk, char *name, char *value)
 	return 0;
 }
 
-static void
+/* unsetting variable is not used at the moment */
+static int
 grub_envblk_delete(grub_envblk_t envblk, char *name)
 {
 	char *p, *pend;
@@ -207,7 +209,7 @@ grub_envblk_delete(grub_envblk_t envblk, char *name)
 
 			if (p + len >= pend)
 				/* Broken.  */
-				return;
+				return -1;
 
 			len++;
 			memmove(p, p + len, pend - (p + len));
@@ -217,6 +219,7 @@ grub_envblk_delete(grub_envblk_t envblk, char *name)
 
 		p = find_next_line(p, pend);
 	}
+	return 0;
 }
 
 static grub_envblk_t
@@ -272,46 +275,70 @@ grub_open_envblk_file(void)
 	return envblk;
 }
 
-static void
+static int
 grub_write_envblk(grub_envblk_t envblk)
 {
 	FILE *fp;
 
+	int ret = 0;
 	fp = fopen(GRUB_ENVBLK_PATH, "wb");
-	if (!fp)
+	if (!fp) {
 		fprintf(stderr, "GRUB: cannot open %s\n", GRUB_ENVBLK_PATH);
+		return -1;
+	}
 
 	if (fwrite(grub_envblk_buffer(envblk), 1, grub_envblk_size(envblk), fp)
-	    != grub_envblk_size(envblk))
+	    != grub_envblk_size(envblk)) {
 		fprintf(stderr, "GRUB: cannot write to %s\n", GRUB_ENVBLK_PATH);
-
-	static int allow_fd_syncs = 1;
+		return -1;
+	}
 
 	fflush(fp);
-	if (allow_fd_syncs)
-		fsync(fileno(fp));
+	fsync(fileno(fp));
+	ret = fclose(fp);
 
-	fclose(fp);
+	return ret;
 }
 
-void
+int
 grub_set_variable(char *name, char *value)
 {
+	int ret = 0;
 	grub_envblk_t envblk;
 	envblk = grub_open_envblk_file();
-	if (!grub_envblk_set(envblk, name, value))
-		fprintf(stderr, "GRUB: environment block too small\n");
+	if (!envblk) {
+		fprintf(stderr, "GRUB: failed to open envblk file\n");
+		return -1;
+	}
 
-	grub_write_envblk(envblk);
+	if (grub_envblk_set(envblk, name, value)) {
+		fprintf(stderr, "GRUB: environment block too small\n");
+		return -1;
+	}
+
+	ret = grub_write_envblk(envblk);
 	grub_envblk_close(envblk);
+	return ret;
 }
 
-void
+/* unsetting variable is not used at the moment */
+int
 grub_unset_variable(char *name)
 {
+	int ret = 0;
 	grub_envblk_t envblk;
 	envblk = grub_open_envblk_file();
-	grub_envblk_delete(envblk, name);
-	grub_write_envblk(envblk);
+	if (!envblk) {
+		fprintf(stderr, "GRUB: failed to open envblk file\n");
+		return -1;
+	}
+
+	if (grub_envblk_delete(envblk, name)) {
+		fprintf(stderr, "GRUB: failed to delete variable: %s\n", name);
+		return ret;
+	}
+
+	ret = grub_write_envblk(envblk);
 	grub_envblk_close(envblk);
+	return ret;
 }
