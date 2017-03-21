@@ -41,7 +41,7 @@ grub_envblk_open(char *buf, size_t size)
 	    || memcmp(buf, GRUB_ENVBLK_SIGNATURE,
 		      sizeof(GRUB_ENVBLK_SIGNATURE) - 1)) {
 		fprintf(stderr, "GRUB: invalid environment block\n");
-		return 0;
+		return NULL;
 	}
 
 	envblk = malloc(sizeof(*envblk));
