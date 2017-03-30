@@ -37,7 +37,7 @@ int grubenv_append(char *grubenv, const char *name, const char *value,
 		   int space);
 int grubenv_space(char *grubenv);
 int grubenv_write(const char *grubenv_file, const char *grubenv);
-int grubenv_llen(const char *grubenv, char *ptrline);
+int grubenv_llen(char *ptrline);
 
 /* only these should be called from external */
 int grubenv_set(const char *grubenv_file, const char *name, const char *value);
