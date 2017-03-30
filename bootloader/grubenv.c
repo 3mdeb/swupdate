@@ -140,7 +140,7 @@ int grubenv_space(char *grubenv)
 int grubenv_append(char *grubenv, const char *name, const char *value,
 	           int space)
 {
-	int nlen, vlen, llen, counter;
+	int llen;
 	char *ptr, *line;
 
 	if (!name) {
