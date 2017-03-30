@@ -45,7 +45,7 @@
 #include "progress.h"
 
 #ifdef CONFIG_GRUB
-#include "grub_env.h"
+#include "grubenv.h"
 #endif /* CONFIG_GRUB */
 
 static int isImageInstalled(struct swver *sw_ver_list,
@@ -223,7 +223,8 @@ static int update_grub_env(struct swupdate_cfg *cfg)
 	LIST_FOREACH(grubvar, &cfg->grub, next) {
 		if (!grubvar->varname || !grubvar->value)
 			continue;
-		ret = grub_set_variable(grubvar->varname, grubvar->value);
+		ret = grubenv_set(GRUBENV_PATH, grubvar->varname,
+				grubvar->value);
 		if (ret < 0) {
 			ERROR("Error updating GRUB environment");
 			break;

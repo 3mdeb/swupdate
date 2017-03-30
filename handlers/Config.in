@@ -155,7 +155,7 @@ config GRUB
 	  Enable it to change GRUB environment
 	  during the installation process.
 
-config GRUB_ENV
+config GRUBENV
 	string "GRUB Environment block file path"
 	depends on GRUB
 	default "/boot/efi/EFI/BOOT/grub/grubenv"
