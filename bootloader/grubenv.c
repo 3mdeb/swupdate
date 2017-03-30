@@ -97,7 +97,7 @@ char *grubenv_find(const char *grubenv, const char *name)
 	return ptrline;
 }
 
-int grubenv_llen(const char *grubenv, char *ptrline)
+int grubenv_llen(char *ptrline)
 {
 	char *ptrstart = ptrline;
 	while (*ptrline != '\n') {
@@ -108,7 +108,7 @@ int grubenv_llen(const char *grubenv, char *ptrline)
 
 void grubenv_remove(char *grubenv, char *ptrline, int space)
 {
-	int llen = grubenv_llen(grubenv, ptrline);
+	int llen = grubenv_llen(ptrline);
 	char *ptrend = grubenv + GRUBENV_SIZE - 1;
 
 	/* copy block after given line at the beginning of this line */
@@ -235,7 +235,7 @@ int grubenv_set(const char *grubenv_file, const char *name, const char *value)
 	/* variable already exists in environment */
 	if (found) {
 		/* length of line to be removed */
-		llen = grubenv_llen(grubenv, found);
+		llen = grubenv_llen(found);
 		/* just remove line with found variable */
 		grubenv_remove(grubenv, found, space);
 		space += llen;
@@ -285,7 +285,7 @@ int grubenv_unset(const char *grubenv_file, const char *name)
 	if (found) {
 		/* how many '#' characters to set after var removal */
 		space = grubenv_space(grubenv);
-		space += grubenv_llen(grubenv, found);
+		space += grubenv_llen(found);
 		/* remove line with found variable */
 		grubenv_remove(grubenv, found, space);
 		ret = grubenv_write(grubenv_file, grubenv);
