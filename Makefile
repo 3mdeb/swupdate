@@ -4,10 +4,6 @@ SUBLEVEL = 0
 EXTRAVERSION = -rc1
 NAME =
 
-INSTALL = install
-PREFIX ?= /usr/local
-BINDIR ?= $(PREFIX)/bin
-
 # *DOCUMENTATION*
 # To see a list of typical targets execute "make help"
 # More info can be located in ./README
@@ -520,13 +516,6 @@ endif	# skip-makefile
 
 PHONY += FORCE
 FORCE:
-
-# install
-#
-PHONY += install
-install:
-	$(INSTALL) -d ${BINDIR}/
-	$(INSTALL) -m 0755 swupdate ${BINDIR}/
 
 # Documentation
 # run Makefile in doc directory
