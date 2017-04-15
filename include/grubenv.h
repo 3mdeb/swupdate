@@ -38,3 +38,4 @@ struct grubenv_t {
 int grubenv_set(const char *name, const char *value);
 int grubenv_unset(const char *name);
 int grubenv_apply_list(const char *script);
+char *grubenv_get(const char *name);
