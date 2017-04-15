@@ -27,18 +27,14 @@
 #define GRUBENV_PATH GRUBENV_DEFAULT_PATH
 #endif
 
-/* Internal functions */
-/* Exposed here for unit tests during development */
-char *grubenv_open(const char *grubenv_file);
-char *grubenv_find(const char *grubenv, const char *name);
-void grubenv_remove(char *grubenv, char *ptrline, int space);
-void grubenv_close(char *grubenv);
-int grubenv_append(char *grubenv, const char *name, const char *value,
-		   int space);
-int grubenv_space(char *grubenv);
-int grubenv_write(const char *grubenv_file, const char *grubenv);
-int grubenv_llen(char *ptrline);
+#define GRUBENV_PATH_NEW GRUBENV_PATH ".new"
+
+struct grubenv_t {
+	struct dictlist vars;
+	size_t size;
+};
 
 /* only these should be called from external */
-int grubenv_set(const char *grubenv_file, const char *name, const char *value);
-int grubenv_unset(const char *grubenv_file, const char *name);
+int grubenv_set(const char *name, const char *value);
+int grubenv_unset(const char *name);
+int grubenv_apply_list(const char *script);
