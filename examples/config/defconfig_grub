@@ -22,7 +22,6 @@ CONFIG_LUAPKG="lua50"
 #
 # Build Options
 #
-# CONFIG_STATIC is not set
 CONFIG_CROSS_COMPILE=""
 CONFIG_SYSROOT=""
 CONFIG_EXTRA_CFLAGS=""
@@ -48,11 +47,8 @@ CONFIG_DOWNLOAD=y
 #
 # Server
 #
+# CONFIG_SURICATTA_HAWKBIT is not set
 CONFIG_SURICATTA_SERVER_NONE=y
-
-#
-# hawkBit support needs libcurl and CONFIG_JSON=y
-#
 # CONFIG_WEBSERVER is not set
 
 #
@@ -64,7 +60,7 @@ CONFIG_GUNZIP=y
 # Parser Features
 #
 CONFIG_LIBCONFIG=y
-CONFIG_LIBCONFIGROOT=""
+CONFIG_PARSERROOT=""
 # CONFIG_JSON is not set
 # CONFIG_LUAEXTERNAL is not set
 # CONFIG_SETSWDESCRIPTION is not set
@@ -78,5 +74,10 @@ CONFIG_SHELLSCRIPTHANDLER=y
 CONFIG_ARCHIVE=y
 # CONFIG_REMOTE_HANDLER is not set
 # CONFIG_UBOOT is not set
-CONFIG_GRUB=y
-CONFIG_GRUB_ENV="/boot/efi/EFI/BOOT/grub/grubenv"
+
+#
+# Bootloader selection
+#
+# CONFIG_BOOTLOADER_UBOOT is not set
+CONFIG_BOOTLOADER_GRUB=y
+CONFIG_GRUBENV_PATH="/boot/efi/EFI/BOOT/grub/grubenv"
