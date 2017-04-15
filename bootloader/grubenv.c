@@ -113,7 +113,7 @@ static int grubenv_parse_script(struct grubenv_t *grubenv, const char *script)
 {
 	FILE *fp;
 	int ret = 0;
-	char *line, *key, *value;
+	char *line = NULL, *key, *value;
 	size_t len = 0;
 
 	/* open script generated during sw-description parsing */
