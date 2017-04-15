@@ -225,10 +225,22 @@ static int grubenv_write(struct grubenv_t *grubenv)
 	}
 
 	ret = 0;
+
 cleanup:
 	if (fp) fclose(fp);
 	if (buf) free(buf);
 	return ret;
+}
+
+/* I'm not sure what would be the proper method to free memory from dict list
+ * allocation */
+static inline void grubenv_close(struct grubenv_t *grubenv)
+{
+	struct dict_entry *grubvar;
+
+	LIST_FOREACH(grubvar, &grubenv->vars, next) {
+		dict_remove(&grubenv->vars, grubvar->varname);
+	}
 }
 
 int grubenv_set(const char *name, const char *value)
@@ -237,27 +249,20 @@ int grubenv_set(const char *name, const char *value)
 	int ret;
 
 	/* read env into dictionary list in RAM */
-	ret = grubenv_open(&grubenv);
-	if (ret) {
-		TRACE("grubenv_open ret = %d", ret);
-		return ret;
-	}
+	if (ret = grubenv_open(&grubenv))
+		goto cleanup;
 
 	/* set new variable or change value of existing one */
-	ret = dict_set_value(&grubenv.vars, (char *)name, (char *)value);
-	if (ret) {
-		TRACE("dict_set ret = %d", ret);
-		return ret;
-	}
+	if (ret = dict_set_value(&grubenv.vars, (char *)name, (char *)value))
+		goto cleanup;
 
 	/* form grubenv format out of dictionary list and save it to file */
-	ret = grubenv_write(&grubenv);
-	if (ret) {
-		TRACE("grubenv_write ret = %d", ret);
-		return ret;
-	}
+	if (ret = grubenv_write(&grubenv))
+		goto cleanup;
 
-	return 0;
+cleanup:
+	grubenv_close(&grubenv);
+	return ret;
 }
 
 int grubenv_unset(const char *name)
@@ -266,22 +271,20 @@ int grubenv_unset(const char *name)
 	int ret = 0;
 
 	/* read env into dictionary list in RAM */
-	ret = grubenv_open(&grubenv);
-	if (ret) {
-		return ret;
-	}
+	if (ret = grubenv_open(&grubenv))
+		goto cleanup;
 
 	/* remove entry from dictionary list */
 	dict_remove(&grubenv.vars, (char *)name);
-	if (ret) {
-		return ret;
-	}
 
 	/* form grubenv format out of dictionary list and save it to file */
-	ret = grubenv_write(&grubenv);
-	if (ret) {
-		return ret;
-	}
+	if (ret = grubenv_write(&grubenv))
+		goto cleanup;
+
+cleanup:
+	grubenv_close(&grubenv);
+	return ret;
+}
 
 	return 0;
 }
@@ -292,22 +295,18 @@ int grubenv_apply_list(const char *script)
 	int ret = 0;
 
 	/* read env into dictionary list in RAM */
-	ret = grubenv_open(&grubenv);
-	if (ret) {
-		return ret;
-	}
+	if (ret = grubenv_open(&grubenv))
+		goto cleanup;
 
 	/* add variables from sw-description into dict list */
-	ret = grubenv_parse_script(&grubenv, script);
-	if (ret) {
-		return ret;
-	}
+	if (ret = grubenv_parse_script(&grubenv, script))
+		goto cleanup;
 
 	/* form grubenv format out of dictionary list and save it to file */
-	ret = grubenv_write(&grubenv);
-	if (ret) {
-		return ret;
-	}
+	if (ret = grubenv_write(&grubenv))
+		goto cleanup;
 
-	return 0;
+cleanup:
+	grubenv_close(&grubenv);
+	return ret;
 }
