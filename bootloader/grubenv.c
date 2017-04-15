@@ -168,9 +168,9 @@ static inline void grubenv_update_size(struct grubenv_t *grubenv)
 static int grubenv_write(struct grubenv_t *grubenv)
 {
 	FILE *fp = NULL;
-	char *buf = NULL, *ptr;
+	char *buf = NULL, *ptr, line[SWUPDATE_GENERAL_STRING_SIZE];
 	struct dict_entry *grubvar;
-	int ret = 0, nlen = 0, vlen = 0;
+	int ret = 0, llen = 0;
 
 	grubenv_update_size(grubenv);
 	DEBUG("grubenv in memory size: %ld", grubenv->size);
@@ -195,21 +195,20 @@ static int grubenv_write(struct grubenv_t *grubenv)
 		goto cleanup;
 	}
 
-	memcpy(buf, GRUBENV_HEADER, strlen(GRUBENV_HEADER));
-	ptr = buf + strlen(GRUBENV_HEADER);
+	/* form grubenv-formatted block inside memory */
+	/* +1 for null termination */
+	strncpy(buf, GRUBENV_HEADER, strlen(GRUBENV_HEADER) + 1);
 
 	LIST_FOREACH(grubvar, &grubenv->vars, next) {
-		nlen = strlen(grubvar->varname);
-		vlen = strlen(grubvar->value);
-		memcpy(ptr, grubvar->varname, nlen);
-		ptr += nlen;
-		memcpy(ptr, "=", 1);
-		ptr++;
-		memcpy(ptr, grubvar->value, vlen);
-		ptr += vlen;
-		memcpy(ptr, "\n", 1);
-		ptr++;
+		llen = strlen(grubvar->varname) + strlen(grubvar->value) + 2;
+		/* +1 for null termination */
+		snprintf(line, llen + 1, "%s=%s\n", grubvar->varname,
+						grubvar->value);
+		strncat(buf, line, llen);
 	}
+
+	/* # chars starts there */
+	ptr = buf + grubenv->size;
 
 	/* fill with '#' from current ptr position up to the end of block */
 	memset(ptr, '#', buf + GRUBENV_SIZE - ptr);
