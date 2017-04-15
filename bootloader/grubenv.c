@@ -104,7 +104,8 @@ static int grubenv_open(struct grubenv_t *grubenv)
 
 cleanup:
 	if (fp) fclose(fp);
-	if (buf) free(buf);
+	/* free(null) should not harm anything */
+	free(buf);
 	return ret;
 }
 
@@ -141,7 +142,8 @@ static int grubenv_parse_script(struct grubenv_t *grubenv, const char *script)
 
 cleanup:
 	if (fp) fclose(fp);
-	if (line) free(line);
+	/* free(null) should not harm anything */
+	free(line);
 	return ret;
 }
 
@@ -233,7 +235,8 @@ static int grubenv_write(struct grubenv_t *grubenv)
 
 cleanup:
 	if (fp) fclose(fp);
-	if (buf) free(buf);
+	/* free(null) should not harm anything */
+	free(buf);
 	return ret;
 }
 
