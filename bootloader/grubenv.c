@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <stdbool.h>
 #include "util.h"
 #include "grubenv.h"
 #include "swupdate_dict.h"
@@ -31,8 +32,9 @@ static int grubenv_open(struct grubenv_t *grubenv)
 {
 	FILE *fp = NULL;
 	size_t size;
-	int ret = 0, counter = 0;
+	int ret = 0;
 	char *buf = NULL, *key, *value;
+	bool not_null;
 
 	fp = fopen(GRUBENV_PATH, "rb");
 	if (!fp) {
@@ -84,11 +86,11 @@ static int grubenv_open(struct grubenv_t *grubenv)
 	/* truncate header, prepare buf for further splitting */
 	strtok(buf, "\n");
 
-	while (counter < 1024) {
+	do {
 		key = strtok(NULL, "=");
 		value = strtok(NULL, "\n");
-		counter++;
-		if (value != NULL && key != NULL) {
+		not_null = (value != NULL && key != NULL);
+		if (not_null) {
 			ret = dict_set_value(&grubenv->vars, key, value);
 			if (ret) {
 				ERROR("Adding pair [%s] = %s into dictionary \
@@ -98,9 +100,7 @@ static int grubenv_open(struct grubenv_t *grubenv)
 			DEBUG("Added to grubenv dict list: [%s] = %s\n", key,
 					value);
 		}
-		else
-			break;
-	}
+	} while (not_null);
 
 cleanup:
 	if (fp) fclose(fp);
