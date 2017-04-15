@@ -1,0 +1,28 @@
+#
+# For a description of the syntax of this configuration file,
+# see scripts/kbuild/config-language.txt.
+#
+
+menu "Bootloader selection"
+
+choice
+	prompt "Select used bootloader"
+
+	config BOOTLOADER_UBOOT
+		bool "U-Boot bootloader"
+		help
+			selects U-Boot as used bootloader
+	config BOOTLOADER_GRUB
+		bool "GRUB Bootloader"
+		help
+			selects GRUB as used bootloader
+endchoice
+
+config GRUBENV_PATH
+	string "GRUB Environment block file path"
+	depends on BOOTLOADER_GRUB
+	default "/boot/efi/EFI/BOOT/grub/grubenv"
+	help
+	  Provide path to GRUB environment block file
+
+endmenu

@@ -318,3 +318,4 @@ source mongoose/Config.in
 source archival/Config.in
 source parser/Config.in
 source handlers/Config.in
+source bootloader/Config.in
