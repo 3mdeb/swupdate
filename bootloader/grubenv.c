@@ -145,7 +145,11 @@ cleanup:
 	return ret;
 }
 
-static void grubenv_update_size(struct grubenv_t *grubenv)
+/* I'm not sure about size member of grubenv_t struct
+ * It seems to me that it is enough if we check size of env stored in dict list
+ * only once, just before writing into grubenv file.
+ */
+static inline void grubenv_update_size(struct grubenv_t *grubenv)
 {
 	int size = 0;
 	struct dict_entry *grubvar;
