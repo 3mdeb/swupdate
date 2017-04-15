@@ -28,11 +28,23 @@
 #include "generated/autoconf.h"
 #include "swupdate.h"
 #include "handler.h"
-#include "fw_env.h"
 #include "util.h"
 
-static void uboot_handler(void);
+#ifdef CONFIG_BOOTLOADER_UBOOT
+#include "fw_env.h"
+#endif /* CONFIG_BOOTLOADER_UBOOT */
 
+#ifdef CONFIG_BOOTLOADER_GRUB
+#include "grubenv.h"
+#endif /* CONFIG_BOOTLOADER_GRUB */
+
+
+/* common prototype */
+static void bootloader_handler(void);
+
+
+/* U-Boot handler */
+#ifdef CONFIG_BOOTLOADER_UBOOT
 struct env_opts *fw_env_opts = &(struct env_opts) {
 	.config_file = (char *)CONFIG_UBOOT_FWENV
 };
@@ -77,9 +89,49 @@ static int install_uboot_environment(struct img_type *img,
 	return ret;
 
 }
+#endif /* CONFIG_BOOTLOADER_UBOOT */
+
+/* GRUB handler */
+#ifdef CONFIG_BOOTLOADER_GRUB
+static int install_grub_environment(struct img_type *img,
+	void __attribute__ ((__unused__)) *data)
+{
+	int ret;
+	int fdout;
+	char buf[64];
+
+	char filename[64];
+	struct stat statbuf;
+
+	snprintf(filename, sizeof(filename), "%s%s", TMPDIR, img->fname);
+	ret = stat(filename, &statbuf);
+	if (ret) {
+		fdout = openfileoutput(filename);
+		ret = copyimage(&fdout, img, NULL);
+		close(fdout);
+	}
+
+	ret = grubenv_apply_list(filename);
+
+	if (ret < 0)
+		snprintf(buf, sizeof(buf), "Error setting GRUB environment");
+	else
+		snprintf(buf, sizeof(buf), "GRUB environment updated");
+
+	notify(RUN, RECOVERY_NO_ERROR, buf);
+
+	return ret;
+}
+#endif /* CONFIG_BOOTLOADER_GRUB */
 
 __attribute__((constructor))
-static void uboot_handler(void)
+static void bootloader_handler(void)
 {
-	register_handler("uboot", install_uboot_environment, NULL);
+	#ifdef CONFIG_BOOTLOADER_UBOOT
+	register_handler("bootloader", install_uboot_environment, NULL);
+	#endif /* CONFIG_BOOTLOADER_UBOOT */
+
+	#ifdef CONFIG_BOOTLOADER_GRUB
+	register_handler("bootloader", install_grub_environment, NULL);
+	#endif /* CONFIG_BOOTLOADER_GRUB */
 }
