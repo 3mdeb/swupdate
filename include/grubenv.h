@@ -21,13 +21,13 @@
 #define GRUBENV_HEADER "# GRUB Environment Block\n"
 #define GRUBENV_DEFAULT_PATH "/boot/efi/EFI/BOOT/grub/grubenv"
 
-#ifdef CONFIG_GRUBENV
-#define GRUBENV_PATH CONFIG_GRUBENV
+#ifdef CONFIG_GRUBENV_PATH
+#define GRUBENV_PATH	CONFIG_GRUBENV_PATH
 #else
-#define GRUBENV_PATH GRUBENV_DEFAULT_PATH
+#define GRUBENV_PATH	GRUBENV_DEFAULT_PATH
 #endif
 
-#define GRUBENV_PATH_NEW GRUBENV_PATH ".new"
+#define GRUBENV_PATH_NEW	GRUBENV_PATH ".new"
 
 struct grubenv_t {
 	struct dictlist vars;

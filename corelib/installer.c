@@ -41,12 +41,15 @@
 #include "handler.h"
 #include "cpiohdr.h"
 #include "parsers.h"
-#include "fw_env.h"
 #include "progress.h"
 
-#ifdef CONFIG_GRUB
+#ifdef CONFIG_BOOTLOADER_UBOOT
+#include "fw_env.h"
+#endif /* CONFIG_BOOTLOADER_UBOOT */
+
+#ifdef CONFIG_BOOTLOADER_GRUB
 #include "grubenv.h"
-#endif /* CONFIG_GRUB */
+#endif /* CONFIG_BOOTLOADER_GRUB */
 
 static int isImageInstalled(struct swver *sw_ver_list,
 				struct img_type *img)
@@ -203,14 +206,14 @@ static int update_bootloader_env(void)
 {
 	int ret = 0;
 
-#ifdef CONFIG_UBOOT
+#ifdef CONFIG_BOOTLOADER_UBOOT
 	TRACE("Updating U-boot environment");
 	ret = fw_parse_script((char *)BOOTLOADER_SCRIPT, fw_env_opts);
 	if (ret < 0)
 		ERROR("Error updating U-Boot environment");
 #endif
 
-#ifdef CONFIG_GRUB
+#ifdef CONFIG_BOOTLOADER_GRUB
 	TRACE("Updating GRUB environment");
 	ret = grubenv_apply_list((char *)BOOTLOADER_SCRIPT);
 	if (ret < 0)
