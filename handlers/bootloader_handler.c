@@ -29,14 +29,8 @@
 #include "swupdate.h"
 #include "handler.h"
 #include "util.h"
-
-#ifdef CONFIG_BOOTLOADER_UBOOT
 #include "fw_env.h"
-#endif /* CONFIG_BOOTLOADER_UBOOT */
-
-#ifdef CONFIG_BOOTLOADER_GRUB
 #include "grubenv.h"
-#endif /* CONFIG_BOOTLOADER_GRUB */
 
 
 /* common prototype */

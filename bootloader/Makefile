@@ -1,1 +1,1 @@
-lib-$(CONFIG_BOOTLOADER_GRUB)	+= grubenv.o
+lib-$(CONFIG_BOOTLOADER_GRUB)	+= bootloader.o grubenv.o
