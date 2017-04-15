@@ -251,15 +251,15 @@ int grubenv_set(const char *name, const char *value)
 	int ret;
 
 	/* read env into dictionary list in RAM */
-	if (ret = grubenv_open(&grubenv))
+	if ((ret = grubenv_open(&grubenv)))
 		goto cleanup;
 
 	/* set new variable or change value of existing one */
-	if (ret = dict_set_value(&grubenv.vars, (char *)name, (char *)value))
+	if ((ret = dict_set_value(&grubenv.vars, (char *)name, (char *)value)))
 		goto cleanup;
 
 	/* form grubenv format out of dictionary list and save it to file */
-	if (ret = grubenv_write(&grubenv))
+	if ((ret = grubenv_write(&grubenv)))
 		goto cleanup;
 
 cleanup:
@@ -273,14 +273,14 @@ int grubenv_unset(const char *name)
 	int ret = 0;
 
 	/* read env into dictionary list in RAM */
-	if (ret = grubenv_open(&grubenv))
+	if ((ret = grubenv_open(&grubenv)))
 		goto cleanup;
 
 	/* remove entry from dictionary list */
 	dict_remove(&grubenv.vars, (char *)name);
 
 	/* form grubenv format out of dictionary list and save it to file */
-	if (ret = grubenv_write(&grubenv))
+	if ((ret = grubenv_write(&grubenv)))
 		goto cleanup;
 
 cleanup:
@@ -295,14 +295,14 @@ char *grubenv_get(const char *name)
 	int ret = 0;
 
 	/* read env into dictionary list in RAM */
-	if (ret = grubenv_open(&grubenv))
+	if ((ret = grubenv_open(&grubenv)))
 		goto cleanup;
 
 	/* retrieve value of given variable from dictionary list */
 	value = dict_get_value(&grubenv.vars, (char *)name);
 
 	/* form grubenv format out of dictionary list and save it to file */
-	if (ret = grubenv_write(&grubenv))
+	if ((ret = grubenv_write(&grubenv)))
 		goto cleanup;
 
 	grubenv_close(&grubenv);
@@ -319,15 +319,15 @@ int grubenv_apply_list(const char *script)
 	int ret = 0;
 
 	/* read env into dictionary list in RAM */
-	if (ret = grubenv_open(&grubenv))
+	if ((ret = grubenv_open(&grubenv)))
 		goto cleanup;
 
 	/* add variables from sw-description into dict list */
-	if (ret = grubenv_parse_script(&grubenv, script))
+	if ((ret = grubenv_parse_script(&grubenv, script)))
 		goto cleanup;
 
 	/* form grubenv format out of dictionary list and save it to file */
-	if (ret = grubenv_write(&grubenv))
+	if ((ret = grubenv_write(&grubenv)))
 		goto cleanup;
 
 cleanup:
