@@ -17,6 +17,8 @@
  * Foundation, Inc.
  */
 
+#ifndef _GRUBENV_H
+#define _GRUBENV_H
 #define GRUBENV_SIZE 1024 /* bytes */
 #define GRUBENV_HEADER "# GRUB Environment Block\n"
 #define GRUBENV_DEFAULT_PATH "/boot/efi/EFI/BOOT/grub/grubenv"
@@ -39,3 +41,5 @@ int grubenv_set(const char *name, const char *value);
 int grubenv_unset(const char *name);
 int grubenv_apply_list(const char *script);
 char *grubenv_get(const char *name);
+
+#endif
