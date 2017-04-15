@@ -51,7 +51,8 @@ char *sdup(const char *str) {
  * Replacement for fw_setenv() for calling inside
  * the library
  */
-#ifdef CONFIG_UBOOT
+/* bootloader handler and U-Boot bootloader is choosen */
+#if defined(CONFIG_BOOTLOADER) && defined(CONFIG_BOOTLOADER_UBOOT)
 /*
  * The lockfile is the same as defined in U-Boot for
  * the fw_printenv utilities

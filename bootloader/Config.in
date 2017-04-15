@@ -10,12 +10,18 @@ choice
 
 	config BOOTLOADER_UBOOT
 		bool "U-Boot bootloader"
+		depends on HAVE_LIBUBOOTENV
+		depends on HAVE_ZLIB
 		help
-			selects U-Boot as used bootloader
+		  Select U-Boot as used bootloader
+
+	comment "uboot support needs libubootenv, libz"
+		depends on !HAVE_ZLIB
+
 	config BOOTLOADER_GRUB
 		bool "GRUB Bootloader"
 		help
-			selects GRUB as used bootloader
+		  Select GRUB as used bootloader
 endchoice
 
 config GRUBENV_PATH
@@ -24,5 +30,14 @@ config GRUBENV_PATH
 	default "/boot/efi/EFI/BOOT/grub/grubenv"
 	help
 	  Provide path to GRUB environment block file
+
+config UBOOT_FWENV
+	string "U-Boot Environment Configuration file"
+	depends on BOOTLOADER_UBOOT
+	default "/etc/fw_env.config"
+	help
+	  This is the file described in U-Boot documentation
+	  in the tools directory. It tells where the U-Boot
+	  environment is saved.
 
 endmenu

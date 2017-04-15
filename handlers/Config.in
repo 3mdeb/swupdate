@@ -126,26 +126,14 @@ config REMOTE_HANDLER
 comment "remote handler needs zeromq"
 	depends on !HAVE_LIBZEROMQ
 
-
-config UBOOT
-	bool "uboot"
-	depends on HAVE_LIBUBOOTENV
-	depends on HAVE_ZLIB
+config BOOTLOADER
+	bool "bootloader"
+	depends on BOOTLOADER_GRUB || BOOTLOADER_UBOOT
 	default n
 	help
-	  Enable it to change U-Boot environment
+	  Enable it to change bootloader environment
 	  during the installation process.
 
-comment "uboot support needs libubootenv, libz"
-	depends on !HAVE_ZLIB
-
-config UBOOT_FWENV
-	string "U-Boot Environment Configuration file"
-	depends on UBOOT
-	default "/etc/fw_env.config"
-	help
-	  This is the file described in U-Boot documentation
-	  in the tools directory. It tells where the U-Boot
-	  environment is saved.
+comment "select used bootloader in 'Bootloader selection' menu"
 
 endmenu

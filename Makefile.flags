@@ -161,8 +161,10 @@ ifeq ($(CONFIG_REMOTE_HANDLER),y)
 LDLIBS += zmq
 endif
 
-ifeq ($(CONFIG_UBOOT),y)
-LDLIBS += z ubootenv
+ifeq ($(CONFIG_BOOTLOADER),y)
+	ifeq ($(CONFIG_BOOTLOADER_UBOOT),y)
+	LDLIBS += z ubootenv
+	endif
 endif
 
 # suricatta
