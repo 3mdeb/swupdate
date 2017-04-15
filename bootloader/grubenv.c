@@ -154,8 +154,10 @@ static inline void grubenv_update_size(struct grubenv_t *grubenv)
 	int size = 0;
 	struct dict_entry *grubvar;
 
+	/* lenghts of strings + '=' and '\n' characters */
 	LIST_FOREACH(grubvar, &grubenv->vars, next) {
-		size = strlen(grubvar->varname) + strlen(grubvar->value) + 2;
+		size = size + strlen(grubvar->varname) +
+						strlen(grubvar->value) + 2;
 	}
 	size += strlen(GRUBENV_HEADER);
 	grubenv->size = size;
