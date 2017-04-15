@@ -95,8 +95,8 @@ static int grubenv_open(struct grubenv_t *grubenv)
 		if (not_null) {
 			ret = dict_set_value(&grubenv->vars, key, value);
 			if (ret) {
-				ERROR("Adding pair [%s] = %s into dictionary \
-						list failed\n", key, value);
+				ERROR("Adding pair [%s] = %s into dictionary"
+						"list failed\n", key, value);
 				return ret;
 			}
 			DEBUG("Added to grubenv dict list: [%s] = %s\n", key,
@@ -133,8 +133,8 @@ static int grubenv_parse_script(struct grubenv_t *grubenv, const char *script)
 		if (value != NULL && key != NULL) {
 			ret = dict_set_value(&grubenv->vars, key, value);
 			if (ret) {
-				ERROR("Adding pair [%s] = %s into dictionary \
-						list failed\n", key, value);
+				ERROR("Adding pair [%s] = %s into dictionary"
+						"list failed\n", key, value);
 				goto cleanup;
 			}
 			DEBUG("Added to grubenv dict list: [%s] = %s\n", key,
