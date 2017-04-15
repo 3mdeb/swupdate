@@ -398,7 +398,7 @@ static void swupdate_init(struct swupdate_cfg *sw)
 	LIST_INIT(&sw->partitions);
 	LIST_INIT(&sw->hardware);
 	LIST_INIT(&sw->scripts);
-	LIST_INIT(&sw->uboot);
+	LIST_INIT(&sw->bootloader);
 
 
 	/* Create directories for scripts */

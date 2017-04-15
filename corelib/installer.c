@@ -172,23 +172,23 @@ static int extract_script(int fd, struct imglist *head, const char *dest)
 	return 0;
 }
 
-static int prepare_uboot_script(struct swupdate_cfg *cfg, const char *script)
+static int prepare_bootloader_script(struct swupdate_cfg *cfg, const char *script)
 {
 	int fd;
 	int ret = 0;
-	struct dict_entry *ubootvar;
-	char buf[MAX_UBOOT_SCRIPT_LINE_LENGTH];
+	struct dict_entry *bootloadervar;
+	char buf[MAX_BOOTLOADER_SCRIPT_LINE_LENGTH];
 
 	fd = openfileoutput(script);
 	if (fd < 0)
 		return -1;
 
-	LIST_FOREACH(ubootvar, &cfg->uboot, next) {
-		if (!ubootvar->varname || !ubootvar->value)
+	LIST_FOREACH(bootloadervar, &cfg->bootloader, next) {
+		if (!bootloadervar->varname || !bootloadervar->value)
 			continue;
 		snprintf(buf, sizeof(buf), "%s %s\n",
-			ubootvar->varname,
-			ubootvar->value);
+			bootloadervar->varname,
+			bootloadervar->value);
 		if (write(fd, buf, strlen(buf)) != strlen(buf)) {
 			  TRACE("Error saving temporary file");
 			  ret = -1;
@@ -199,40 +199,25 @@ static int prepare_uboot_script(struct swupdate_cfg *cfg, const char *script)
 	return ret;
 }
 
-static int update_uboot_env(void)
+static int update_bootloader_env(void)
 {
 	int ret = 0;
 
 #ifdef CONFIG_UBOOT
 	TRACE("Updating U-boot environment");
-	ret = fw_parse_script((char *)UBOOT_SCRIPT, fw_env_opts);
+	ret = fw_parse_script((char *)BOOTLOADER_SCRIPT, fw_env_opts);
 	if (ret < 0)
 		ERROR("Error updating U-Boot environment");
 #endif
-	return ret;
-}
 
 #ifdef CONFIG_GRUB
-static int update_grub_env(struct swupdate_cfg *cfg)
-{
-	int ret = 0;
-
-	struct dict_entry *grubvar;
 	TRACE("Updating GRUB environment");
-
-	LIST_FOREACH(grubvar, &cfg->grub, next) {
-		if (!grubvar->varname || !grubvar->value)
-			continue;
-		ret = grubenv_set(GRUBENV_PATH, grubvar->varname,
-				grubvar->value);
-		if (ret < 0) {
-			ERROR("Error updating GRUB environment");
-			break;
-		}
-	}
+	ret = grubenv_apply_list((char *)BOOTLOADER_SCRIPT);
+	if (ret < 0)
+		ERROR("Error updating GRUB environment");
+#endif
 	return ret;
 }
-#endif /* CONFIG_GRUB */
 
 int install_single_image(struct img_type *img)
 {
@@ -290,19 +275,11 @@ int install_images(struct swupdate_cfg *sw, int fdsw, int fromfile)
 		return ret;
 	}
 
-	/* Update u-boot environment */
-	ret = prepare_uboot_script(sw, UBOOT_SCRIPT);
+	/* Update bootloader environment */
+	ret = prepare_bootloader_script(sw, BOOTLOADER_SCRIPT);
 	if (ret) {
 		return ret;
 	}
-
-#ifdef CONFIG_GRUB
-	/* Update GRUB environment */
-	ret = update_grub_env(sw);
-	if (ret) {
-		return ret;
-	}
-#endif /* CONFIG_GRUB */
 
 	LIST_FOREACH(img, &sw->images, next) {
 
@@ -363,8 +340,8 @@ int install_images(struct swupdate_cfg *sw, int fdsw, int fromfile)
 		return ret;
 	}
 
-	if (!LIST_EMPTY(&sw->uboot))
-		ret = update_uboot_env();
+	if (!LIST_EMPTY(&sw->bootloader))
+		ret = update_bootloader_env();
 
 	return ret;
 }
@@ -402,7 +379,7 @@ static void remove_sw_file(char __attribute__ ((__unused__)) *fname)
 void cleanup_files(struct swupdate_cfg *software) {
 	char fn[64];
 	struct img_type *img;
-	struct dict_entry *ubootvar;
+	struct dict_entry *bootloadervar;
 	struct hw_type *hw;
 
 	LIST_FOREACH(img, &software->images, next) {
@@ -421,8 +398,8 @@ void cleanup_files(struct swupdate_cfg *software) {
 		LIST_REMOVE(img, next);
 		free(img);
 	}
-	LIST_FOREACH(ubootvar, &software->uboot, next) {
-		dict_remove_entry(ubootvar);
+	LIST_FOREACH(bootloadervar, &software->bootloader, next) {
+		dict_remove_entry(bootloadervar);
 	}
 
 	LIST_FOREACH(hw, &software->hardware, next) {
