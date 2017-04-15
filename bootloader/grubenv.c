@@ -77,7 +77,7 @@ static int grubenv_open(struct grubenv_t *grubenv)
 		goto cleanup;
 	}
 
-	if (memcmp(buf, GRUBENV_HEADER, sizeof(GRUBENV_HEADER) -1)) {
+	if (memcmp(buf, GRUBENV_HEADER, strlen(GRUBENV_HEADER) -1)) {
 		ERROR("Invalid grubenv header\n");
 		ret = -1;
 		goto cleanup;
