@@ -19,6 +19,17 @@
 
 #ifndef _GRUBENV_H
 #define _GRUBENV_H
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <stdbool.h>
+#include "util.h"
+#include "grubenv.h"
+#include "swupdate_dict.h"
+
+
 #define GRUBENV_SIZE 1024 /* bytes */
 #define GRUBENV_HEADER "# GRUB Environment Block\n"
 #define GRUBENV_DEFAULT_PATH "/boot/efi/EFI/BOOT/grub/grubenv"
