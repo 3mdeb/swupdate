@@ -209,9 +209,9 @@ static int grubenv_write(struct grubenv_t *grubenv)
 	}
 
 	/* fill with '#' from current ptr position up to the end of block */
-	memset(ptr, '#', buf + GRUBENV_SIZE - 1 - ptr);
+	memset(ptr, '#', buf + GRUBENV_SIZE - ptr);
 	DEBUG("number of chars + number of #'s = %ld\n", grubenv->size +
-			(buf + GRUBENV_SIZE - 1 - ptr));
+			(buf + GRUBENV_SIZE - ptr));
 
 	ret = fwrite(buf , 1, GRUBENV_SIZE, fp);
 	if (ret != GRUBENV_SIZE) {
