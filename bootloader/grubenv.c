@@ -86,9 +86,11 @@ static int grubenv_open(struct grubenv_t *grubenv)
 	/* truncate header, prepare buf for further splitting */
 	strtok(buf, "\n");
 
+	/* load key - value pairs from buffer into dictionary list */
 	do {
 		key = strtok(NULL, "=");
 		value = strtok(NULL, "\n");
+		/* value is null if we are at the last line (# characters) */
 		not_null = (value != NULL && key != NULL);
 		if (not_null) {
 			ret = dict_set_value(&grubenv->vars, key, value);
@@ -153,6 +155,7 @@ cleanup:
  */
 static inline void grubenv_update_size(struct grubenv_t *grubenv)
 {
+	/* size in bytes of grubenv-formatted string */
 	int size = 0;
 	struct dict_entry *grubvar;
 
@@ -215,6 +218,7 @@ static int grubenv_write(struct grubenv_t *grubenv)
 	DEBUG("number of chars + number of #'s = %ld\n", grubenv->size +
 			(buf + GRUBENV_SIZE - ptr));
 
+	/* write buffer into grubenv.nev file */
 	ret = fwrite(buf , 1, GRUBENV_SIZE, fp);
 	if (ret != GRUBENV_SIZE) {
 		ERROR("Failed to write file: %s. Bytes written: %d\n",
@@ -223,6 +227,7 @@ static int grubenv_write(struct grubenv_t *grubenv)
 		goto cleanup;
 	}
 
+	/* rename grubenv.new into grubenv */
 	if (rename(GRUBENV_PATH_NEW, GRUBENV_PATH)) {
 		ERROR("Failed to move environment: %s into %s\n",
 			GRUBENV_PATH_NEW, GRUBENV_PATH);
@@ -250,6 +255,9 @@ static inline void grubenv_close(struct grubenv_t *grubenv)
 	}
 }
 
+/* I feel that '#' and '=' characters should be forbidden. Although it's not
+ * explicitly mentioned in original grub env code, they may cause unexpected
+ * behavior */
 int grubenv_set(const char *name, const char *value)
 {
 	static struct grubenv_t grubenv;
