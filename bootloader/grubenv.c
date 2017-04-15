@@ -171,6 +171,7 @@ static int grubenv_write(struct grubenv_t *grubenv)
 	int ret = 0, nlen = 0, vlen = 0;
 
 	grubenv_update_size(grubenv);
+	DEBUG("grubenv in memory size: %ld", grubenv->size);
 	if (grubenv->size > GRUBENV_SIZE) {
 		ERROR("Not enough free space in envblk file, %ld",
 			grubenv->size);
