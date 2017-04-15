@@ -286,7 +286,29 @@ cleanup:
 	return ret;
 }
 
-	return 0;
+char *grubenv_get(const char *name)
+{
+	static struct grubenv_t grubenv;
+	char *value;
+	int ret = 0;
+
+	/* read env into dictionary list in RAM */
+	if (ret = grubenv_open(&grubenv))
+		goto cleanup;
+
+	/* retrieve value of given variable from dictionary list */
+	value = dict_get_value(&grubenv.vars, (char *)name);
+
+	/* form grubenv format out of dictionary list and save it to file */
+	if (ret = grubenv_write(&grubenv))
+		goto cleanup;
+
+	grubenv_close(&grubenv);
+	return value;
+
+cleanup:
+	grubenv_close(&grubenv);
+	return NULL;
 }
 
 int grubenv_apply_list(const char *script)
