@@ -95,7 +95,8 @@ static int grubenv_open(struct grubenv_t *grubenv)
 						list failed\n", key, value);
 				return ret;
 			}
-			DEBUG("[key] = value : [%s] = %s\n", key, value);
+			DEBUG("Added to grubenv dict list: [%s] = %s\n", key,
+					value);
 		}
 		else
 			break;
@@ -104,6 +105,43 @@ static int grubenv_open(struct grubenv_t *grubenv)
 cleanup:
 	if (fp) fclose(fp);
 	if (buf) free(buf);
+	return ret;
+}
+
+static int grubenv_parse_script(struct grubenv_t *grubenv, const char *script)
+{
+	FILE *fp;
+	int ret = 0;
+	char *line, *key, *value;
+	size_t len = 0;
+
+	/* open script generated during sw-description parsing */
+	fp = fopen(script, "rb");
+	if (!fp) {
+		ERROR("Failed to open grubenv script file: %s\n", script);
+		ret = -1;
+		goto cleanup;
+	}
+
+	/* load  varname-value pairs from script into grubenv dictlist */
+	while ((getline(&line, &len, fp)) != -1) {
+		key = strtok(line, " \t\n");
+		value = strtok(NULL, " \t\n");
+		if (value != NULL && key != NULL) {
+			ret = dict_set_value(&grubenv->vars, key, value);
+			if (ret) {
+				ERROR("Adding pair [%s] = %s into dictionary \
+						list failed\n", key, value);
+				goto cleanup;
+			}
+			DEBUG("Added to grubenv dict list: [%s] = %s\n", key,
+					value);
+		}
+	}
+
+cleanup:
+	if (fp) fclose(fp);
+	if (line) free(line);
 	return ret;
 }
 
@@ -186,42 +224,6 @@ static int grubenv_write(struct grubenv_t *grubenv)
 cleanup:
 	if (fp) fclose(fp);
 	if (buf) free(buf);
-	return ret;
-}
-
-static int grubenv_parse_script(struct grubenv_t *grubenv, const char *script)
-{
-	FILE *fp;
-	int ret = 0;
-	char *line, *key, *value;
-	size_t len = 0;
-
-	/* open script generated during sw-description parsing */
-	fp = fopen(script, "rb");
-	if (!fp) {
-		ERROR("Failed to open grubenv script file: %s\n", script);
-		ret = -1;
-		goto cleanup;
-	}
-
-	/* load  varname-value pairs from script into grubenv dictlist */
-	while ((getline(&line, &len, fp)) != -1) {
-		key = strtok(line, " \t\n");
-		value = strtok(NULL, " \t\n");
-		if (value != NULL && key != NULL) {
-			ret = dict_set_value(&grubenv->vars, key, value);
-			if (ret) {
-				ERROR("Adding pair [%s] = %s into dictionary \
-						list failed\n", key, value);
-				goto cleanup;
-			}
-			DEBUG("[key] = value : [%s] = %s\n", key, value);
-		}
-	}
-
-cleanup:
-	if (fp) fclose(fp);
-	if (line) free(line);
 	return ret;
 }
 
