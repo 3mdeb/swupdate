@@ -111,10 +111,10 @@ int parse(struct swupdate_cfg *sw, const char *descfile)
 			}
 		}
 	}
-	struct img_type item_uboot = {.type = "uboot"};
-	if (!LIST_EMPTY(&sw->uboot) && !find_handler(&item_uboot)) {
-		ERROR("feature 'uboot' absent but %s has 'uboot' section!",
-		      SW_DESCRIPTION_FILENAME);
+	struct img_type item_bootloader = {.type = "bootloader"};
+	if (!LIST_EMPTY(&sw->bootloader) && !find_handler(&item_bootloader)) {
+		ERROR("feature 'bootloader' absent but %s has 'bootloader' " \
+			"section!", SW_DESCRIPTION_FILENAME);
 		return -1;
 	}
 
