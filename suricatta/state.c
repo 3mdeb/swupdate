@@ -21,7 +21,7 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <util.h>
-#include <fw_env.h>
+#include "bootloader.h"
 #include "suricatta/state.h"
 
 /*
@@ -30,9 +30,10 @@
  * environment/
  */
 #define CHECK_STATE_VAR(v) do { \
-	if (strnlen(v, UBOOT_VAR_LENGTH) == 0) { \
-		WARN("Update Status Storage Key (CONFIG_SURICATTA_STATE_UBOOT) " \
-			"is empty, setting it to 'ustate'\n"); \
+	if (strnlen(v, BOOTLOADER_VAR_LENGTH) == 0) { \
+		WARN("Update Status Storage Key " \
+			"(CONFIG_SURICATTA_STATE_BOOTLOADER) is empty, " \
+			"setting it to 'ustate'\n"); \
 		v = (char *)"ustate"; \
 	} \
 } while(0)
@@ -45,7 +46,7 @@ bool is_state_valid(update_state_t state) {
 	return true;
 }
 
-#ifndef CONFIG_SURICATTA_STATE_CHOICE_UBOOT
+#ifndef CONFIG_SURICATTA_STATE_CHOICE_BOOTLOADER
 /*
  * This is just if the state is not stored persistently, that is
  * it does not survive after a reboot.
@@ -81,7 +82,7 @@ server_op_res_t save_state(char *key, update_state_t value)
 
 	CHECK_STATE_VAR(key);
 
-	ret = fw_set_one_env(key, (char *)&value);
+	ret = bootloader_env_set(key, (char *)&value);
 
 	return ret == 0 ? SERVER_OK : SERVER_EERR;
 }
@@ -91,9 +92,9 @@ server_op_res_t read_state(char *key, update_state_t *value)
 	char *envval;
 	CHECK_STATE_VAR(key);
 
-	envval = fw_get_one_env(key);
+	envval = (key);
 	if (envval == NULL) {
-		INFO("Key '%s' not found in U-Boot environment.\n", key);
+		INFO("Key '%s' not found in bootloader environment.\n", key);
 		*value = STATE_NOT_AVAILABLE;
 		return SERVER_OK;
 	}
@@ -107,7 +108,7 @@ server_op_res_t reset_state(char *key)
 	int ret;
 
 	CHECK_STATE_VAR(key);
-	ret = fw_set_one_env(key, NULL);
+	ret = bootloader_env_unset(key);
 	return ret == 0 ? SERVER_OK : SERVER_EERR;
 }
-#endif /* CONFIG_SURICATTA_STATE_CHOICE_UBOOT */
+#endif /* CONFIG_SURICATTA_STATE_CHOICE_BOOTLOADER */

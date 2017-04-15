@@ -15,8 +15,8 @@ comment "SSL support needs libcrypto, libssl"
 
 choice
 	prompt "Update Status Storage"
-	default SURICATTA_STATE_CHOICE_UBOOT if  UBOOT
-	default SURICATTA_STATE_CHOICE_NONE  if !UBOOT
+	default SURICATTA_STATE_CHOICE_BOOTLOADER if BOOTLOADER
+	default SURICATTA_STATE_CHOICE_NONE  if !BOOTLOADER
 	help
 	  Place for suricatta to persistently store the update
 	  status for, e.g., communicating it to the server after
@@ -27,25 +27,25 @@ config SURICATTA_STATE_CHOICE_NONE
 	help
 	  Do not store update status.
 
-config SURICATTA_STATE_CHOICE_UBOOT
-	bool "U-Boot"
-	depends on UBOOT
+config SURICATTA_STATE_CHOICE_BOOTLOADER
+	bool "bootloader"
+	depends on BOOTLOADER
 	depends on HAVE_ZLIB
 	help
-	  Store update status in U-Boot's environment.
-	  Specify U-Boot environment variable name to store update status in.
+	  Store update status in bootloader's environment.
+	  Specify bootloader environment variable name to store update status in.
 
 endchoice
 
-config SURICATTA_STATE_UBOOT
-	string "Store Update Status in U-Boot Environment variable"
+config SURICATTA_STATE_BOOTLOADER
+	string "Store Update Status in bootloader Environment variable"
 	default "ustate"
-	depends on SURICATTA_STATE_CHOICE_UBOOT
+	depends on SURICATTA_STATE_CHOICE_BOOTLOADER
 	help
-	  Store update information in U-Boot's environment.
+	  Store update information in bootloader's environment.
 
-comment "Store Update Status in U-Boot Environment needs CONFIG_UBOOT and libz"
-	depends on !UBOOT
+comment "Store Update Status in bootloader Environment needs CONFIG_BOOTLOADER and libz"
+	depends on !BOOTLOADER
 	depends on !HAVE_ZLIB
 
 endmenu
