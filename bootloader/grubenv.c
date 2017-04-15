@@ -34,7 +34,7 @@ static int grubenv_open(struct grubenv_t *grubenv)
 	size_t size;
 	int ret = 0;
 	char *buf = NULL, *key, *value;
-	bool not_null;
+	bool not_null = false;
 
 	fp = fopen(GRUBENV_PATH, "rb");
 	if (!fp) {
