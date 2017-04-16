@@ -17,6 +17,9 @@
  * Foundation, Inc.
  */
 
+#ifndef _BOOTLOADER_H
+#define _BOOTLOADER_H
+
 #include "fw_env.h"
 #include "grubenv.h"
 
@@ -24,3 +27,5 @@ int bootloader_env_set(const char *name, const char *value);
 int bootloader_env_unset(const char *name);
 int bootloader_apply_list(const char *script);
 char *bootloader_env_get(const char *name);
+
+#endif
