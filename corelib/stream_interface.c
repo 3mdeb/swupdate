@@ -54,6 +54,7 @@
 #include "installer.h"
 #include "progress.h"
 #include "pctl.h"
+#include "bootloader.h"
 
 #define BUFF_SIZE	 4096
 #define PERCENT_LB_INDEX	4
@@ -332,12 +333,12 @@ void *network_initializer(void *data)
 			 * must be successful. Set we have
 			 * initiated an update
 			 */
-			fw_set_one_env("recovery_status", "in_progress");
+			bootloader_env_set("recovery_status", "in_progress");
 
 			notify(RUN, RECOVERY_NO_ERROR, "Installation in progress");
 			ret = install_images(software, 0, 0);
 			if (ret != 0) {
-				fw_set_one_env("recovery_status", "failed");
+				bootloader_env_set("recovery_status", "failed");
 				notify(FAILURE, RECOVERY_ERROR, "Installation failed !");
 				inst.last_install = FAILURE;
 
@@ -346,7 +347,7 @@ void *network_initializer(void *data)
 				 * Clear the recovery variable to indicate to U-Boot
 				 * that it is not required to start recovery again
 				 */
-				fw_set_one_env("recovery_status", "");
+				bootloader_env_unset("recovery_status");
 				notify(SUCCESS, RECOVERY_NO_ERROR, "SWUPDATE successful !");
 				inst.last_install = SUCCESS;
 			}
