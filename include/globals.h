@@ -21,6 +21,7 @@
 #define MAX_REVISION_LENGTH	SWUPDATE_GENERAL_STRING_SIZE
 #define MAX_BOOT_SCRIPT_LINE_LENGTH	1024
 #define MAX_SEEK_STRING_SIZE	32
+#define MAX_COMMAND_LINE 2048
 
 /* These are fixed path to temporary files */
 #define SCRIPTS_DIR_SUFFIX	"scripts/"

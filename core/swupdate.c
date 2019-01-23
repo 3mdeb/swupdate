@@ -573,19 +573,19 @@ int main(int argc, char **argv)
 	int result = EXIT_SUCCESS;
 #ifdef CONFIG_SURICATTA
 	int opt_u = 0;
-	char suricattaoptions[1024];
+	char suricattaoptions[MAX_COMMAND_LINE];
 	char **argvalues = NULL;
 	int argcount = 0;
 #endif
 #ifdef CONFIG_WEBSERVER
 	int opt_w = 0;
-	char weboptions[1024];
+	char weboptions[MAX_COMMAND_LINE];
 	char **av = NULL;
 	int ac = 0;
 #endif
 #ifdef CONFIG_DOWNLOAD
 	int opt_d = 0;
-	char dwloptions[1024];
+	char dwloptions[MAX_COMMAND_LINE];
 #endif
 	char **dwlav = NULL;
 	int dwlac = 0;
