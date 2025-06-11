@@ -7,6 +7,7 @@ obj-$(CONFIG_BOOTLOADER_NONE)	+= none.o
 obj-$(CONFIG_BOOTLOADER_GRUB)	+= grub.o
 obj-$(CONFIG_BOOTLOADER_EBG)	+= ebg.o
 obj-$(CONFIG_BOOTLOADER_CBOOT)	+= cboot.o
+obj-$(CONFIG_BOOTLOADER_EFIVAR)	+= efivar.o
 
 # Make sure none.o is compiled-in as fallback.
 ifeq ($(CONFIG_UBOOT),)

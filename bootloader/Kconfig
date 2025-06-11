@@ -76,6 +76,12 @@ config BOOTLOADER_CBOOT
 comment "Cboot needs libtegra-boot-tools"
 	depends on !HAVE_LIBTEGRABOOT_TOOLS
 
+config BOOTLOADER_EFIVAR
+	bool "Environment in EFI NVRAM"
+	help
+	  This simulates the interface to a bootloader.
+	  Bootloader environment is maintained in EFI NVRAM variables.
+
 endmenu
 
 choice
@@ -90,7 +96,7 @@ config BOOTLOADER_DEFAULT_EBG
 	depends on BOOTLOADER_EBG
 	help
 	  Use EFI Boot Guard as default bootloader interface.
-	  
+
 	  Note: Make sure the environment modification shared
 	  library https://github.com/siemens/efibootguard (including
 	  dependencies) is installed on the target system.
@@ -100,7 +106,7 @@ config BOOTLOADER_DEFAULT_UBOOT
 	depends on UBOOT
 	help
 	  Use U-Boot as default bootloader interface.
-	  
+
 	  Note: Make sure the environment modification shared
 	  library https://github.com/sbabic/libubootenv (including
 	  dependencies) is installed on the target system.
@@ -123,6 +129,12 @@ config BOOTLOADER_DEFAULT_NONE
 	help
 	  Use Environment in RAM as default bootloader interface.
 
+config BOOTLOADER_DEFAULT_EFIVAR
+	bool "Environment in EFI NVRAM"
+	depends on BOOTLOADER_EFIVAR
+	help
+	  Use Environment in EFI NVRAM as default bootloader interface.
+
 endchoice
 
 config BOOTLOADER_STATIC_LINKED
@@ -144,7 +156,7 @@ choice
 
 config UPDATE_STATE_CHOICE_BOOTLOADER
 	bool "Bootloader"
-	depends on BOOTLOADER_EBG || UBOOT || BOOTLOADER_NONE || BOOTLOADER_GRUB
+	depends on BOOTLOADER_EBG || UBOOT || BOOTLOADER_NONE || BOOTLOADER_GRUB || BOOTLOADER_EFIVAR
 	help
 	  Store update status in Bootloader's environment.
 	  Specify Bootloader environment variable name to store update status in.
@@ -157,4 +169,3 @@ config UPDATE_STATE_BOOTLOADER
 	depends on UPDATE_STATE_CHOICE_BOOTLOADER
 	help
 	  Store update information in Bootloader's environment.
-

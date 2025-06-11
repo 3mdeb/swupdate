@@ -13,6 +13,7 @@
 #define BOOTLOADER_GRUB  "grub"
 #define BOOTLOADER_UBOOT "uboot"
 #define BOOTLOADER_CBOOT "cboot"
+#define BOOTLOADER_EFIVAR "efivar"
 
 #define load_symbol(handle, container, fname) \
 	*(void**)(container) = dlsym(handle, fname); \
@@ -114,4 +115,3 @@ extern char* (*bootloader_env_get)(const char *);
  *   0 on success
  */
 extern int (*bootloader_apply_list)(const char *);
-
